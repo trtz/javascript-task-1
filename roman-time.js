@@ -14,7 +14,7 @@ function isValidMinute(minute) {
     return (minute >= 0 && minute <= 59);
 }
 
-function getHHMM(time) {
+function getParts(time) {
     var hhmm = Object();
     var splitted = time.split(":");
     if (splitted.length !== 2) {
@@ -49,13 +49,13 @@ function getDigit(num, first) {
         return getFirstDigit(num);
     }
     if (num === 0) {
-        return "N";
+        return "";
     }
     if (num >= 1 && num <= 3) {
         return repeat("I", num);
     }
     if (num >= 5 && num <= 8) {
-        return "V".concat(repeat("I", num - 5));
+        return "V" + repeat("I", num - 5);
     }
     if (num === 9) {
         return "IX";
@@ -73,9 +73,9 @@ function repeat(str, n) {
     return res;
 }
 
-function deleteExcess(num) {
-    if (num.length !== 1 && num[num.length - 1] === "N") {
-        return num.substr(0, num.length - 1);
+function addNIfNeeded(num) {
+    if (num === "") {
+        num = "N";
     }
 
     return num;
@@ -85,14 +85,14 @@ function getPartRoman(num) {
     var decimals = Math.floor(num / 10);
     var units = num % 10;
 
-    return deleteExcess(getDigit(decimals, true) + getDigit(units, false));
+    return addNIfNeeded(getDigit(decimals, true) + getDigit(units, false));
 }
 
 function romanTime(time) {
     if (typeof time !== "string") {
         throwError();
     }
-    var hhmm = getHHMM(time);
+    var hhmm = getParts(time);
     var hours = hhmm.hours;
     var minutes = hhmm.minutes;
     if (hours.length > 2 || minutes.length > 2 ||
@@ -112,10 +112,8 @@ function isValidInteger(num) {
 }
 
 function throwIfInvalid(hours, minutes) {
-    if (isNaN(hours) || isNaN(minutes)) {
-        throwError();
-    }
-    if (!(isValidHour(hours) && isValidMinute(minutes))) {
+    if (isNaN(hours) || isNaN(minutes) ||
+    !isValidHour(hours) || !isValidMinute(minutes)) {
         throwError();
     }
 }
